@@ -1,4 +1,4 @@
-from fastapi import FastAPI,   HTTPExceptions
+from fastapi import FastAPI,   HTTPException
 from pydantic import BaseModel
 from typing import List 
 
@@ -11,4 +11,4 @@ app = FastAPI(
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to Skills Swap API!"}
+    return {"Welcome to Skills Swap API!"}
