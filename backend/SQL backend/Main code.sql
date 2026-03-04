@@ -37,7 +37,6 @@ CREATE TABLE Listings (
 
 
 
-
 -- TAGS TABLE
 CREATE TABLE Tags (
     tag_id SERIAL PRIMARY KEY,
