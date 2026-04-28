@@ -1,4 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from .. import models, schemas, database
+
 
 router = APIRouter()
 
@@ -8,7 +11,7 @@ async def get_listings():
 
 
 @router.post("/",response_model=schemas.ListingsResponse, status_code=201)
-def create_listing(listing: schema.listingsCreate, db, current_user):
+def create_listing(listing: schemas.listingsCreate, db, current_user):
     new_listing = models.Listing(**listing.dict())
     db.add(new_listing)
     db.commit()
@@ -16,7 +19,7 @@ def create_listing(listing: schema.listingsCreate, db, current_user):
     return new_listing
 
 @router.put("/{listing_id}", response_model=schemas.ListingsResponse)
-def update_listing(listing_id: int, listing: schema.listingsCreate, db, current_user):
+def update_listing(listing_id: int, listing: schemas.listingsCreate, db, current_user):
     existing_listing = db.query(models.Listing).filter(models.Listing.id == listing_id).first()
     if not existing_listing:
         raise HTTPException(status_code=404, detail="Listing not found")
