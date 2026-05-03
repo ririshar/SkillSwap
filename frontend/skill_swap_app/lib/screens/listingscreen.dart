@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/apiservice.dart';
 
+
 class ListingScreen extends StatefulWidget {
   const ListingScreen({super.key});
 
@@ -30,17 +31,20 @@ class _ListingScreenState extends State<ListingScreen> {
                     backendResult = data.toString();
                   });
 
-                  print(data);
-                } catch (error) {
+                
                   setState(() {
-                    backendResult = 'Error: $error';
+                    backendResult = data.toString();
                   });
-
-                  print(error);
-                }
+                  } catch (error) {
+                    setState(() {
+                      backendResult = 'Error: $error';
+                    });
+                  }
               },
               child: const Text('Test Backend'),
             ),
+
+                 
             const SizedBox(height: 20),
             Text(
               backendResult,
