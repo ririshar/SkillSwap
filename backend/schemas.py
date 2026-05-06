@@ -45,3 +45,22 @@ class ListingsResponse(BaseModel):
 
     class Config:
         orm_mode = True
+        
+class ListingsCreate(BaseModel):
+    title: str
+    description: str
+    price: float = 0.0
+    level: str = "Beginner"
+    availability: str = "Flexible"
+
+
+class ListingsResponse(BaseModel):
+    id: int
+    title: str
+    description: str
+    price: float
+    level: str
+    availability: str
+
+    class Config:
+        from_attributes = True
