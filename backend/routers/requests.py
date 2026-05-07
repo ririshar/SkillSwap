@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from .. import models, schemas, database, get_db
+from .. import models, schemas, database
 
 router = APIRouter()
 
@@ -11,7 +11,7 @@ async def get_requests():
 @router.post("/", response_model=schemas.RequestResponse, status_code=status.HTTP_201_CREATED)
 def create_request(
     request: schemas.RequestCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(database.get_db)
 ):
     # Create a new request object
     new_request = models.Request(**request.dict())
@@ -24,7 +24,7 @@ def create_request(
 @router.put("/{request_id}/accept", response_model=schemas.RequestResponse)
 def accept_request(
     request_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(database.get_db)
 ):
     existing_request = db.query(models.Request).filter(models.Request.id == request_id).first()
     if not existing_request:
@@ -41,7 +41,7 @@ def accept_request(
 @router.put("/{request_id}/reject", response_model=schemas.RequestResponse)
 def reject_request(
     request_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(database.get_db)
 ):
     existing_request = db.query(models.Request).filter(models.Request.id == request_id).first()
     if not existing_request:
@@ -56,7 +56,7 @@ def reject_request(
 @router.delete("/{request_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_request(
     request_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(database.get_db)
 ):
     existing_request = db.query(models.Request).filter(models.Request.id == request_id).first()
     if not existing_request:
@@ -69,7 +69,7 @@ def delete_request(
 @router.get("/{request_id}", response_model=schemas.RequestResponse)
 def get_request(
     request_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(database.get_db)
 ):
     existing_request = db.query(models.Request).filter(models.Request.id == request_id).first()
     if not existing_request:
@@ -81,7 +81,7 @@ def get_request(
 @router.get("/listing/{listing_id}", response_model=list[schemas.RequestResponse])
 def get_requests_for_listing(
     listing_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(database.get_db)
 ):
     requests = db.query(models.Request).filter(models.Request.listing_id == listing_id).all()
     return requests
