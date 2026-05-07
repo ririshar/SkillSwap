@@ -5,30 +5,25 @@ from .. import models, schemas, database
 
 router = APIRouter()
 
-@router.get("/")
+@router.get("/", response_model=list[schemas.ListingsResponse])
 def get_listings(db: Session = Depends(database.get_db)):
-    # Mock response for testing
-    mock_listings = [
-        {"id": 1, "title": "Mock Listing 1", "description": "Description for listing 1"},
-        {"id": 2, "title": "Mock Listing 2", "description": "Description for listing 2"}
-    ]
-    return mock_listings
+    return db.query(models.Listing).all()
 
 
 @router.post("/",response_model=schemas.ListingsResponse, status_code=201)
-def create_listing(listing: schemas.ListingsCreate, db, current_user):
-    new_listing = models.Listing(**listing.dict())
+def create_listing(listing: schemas.ListingsCreate, db: Session = Depends(database.get_db)):
+    new_listing = models.Listing(**listing.model_dump())
     db.add(new_listing)
     db.commit()
     db.refresh(new_listing)
     return new_listing
 
 @router.put("/{listing_id}", response_model=schemas.ListingsResponse)
-def update_listing(listing_id: int, listing: schemas.ListingsCreate, db, current_user):
+def update_listing(listing_id: int, listing: schemas.ListingsCreate, db: Session = Depends(database.get_db)):
     existing_listing = db.query(models.Listing).filter(models.Listing.id == listing_id).first()
     if not existing_listing:
         raise HTTPException(status_code=404, detail="Listing not found")
-    for key, value in listing.dict(exclude_unset=True).items():
+    for key, value in listing.model_dump(exclude_unset=True).items():
         setattr(existing_listing, key, value)
 
     db.commit()
@@ -36,7 +31,7 @@ def update_listing(listing_id: int, listing: schemas.ListingsCreate, db, current
     return existing_listing 
 
 @router.delete("/{listing_id}", status_code=204)
-def delete_listing(listing_id: int, db, current_user):
+def delete_listing(listing_id: int, db: Session = Depends(database.get_db)):
     existing_listing = db.query(models.Listing).filter(models.Listing.id == listing_id).first()
     if not existing_listing:
         raise HTTPException(status_code=404, detail="Listing not found")
