@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'createlisting.dart';
+import 'requestscreen.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -113,6 +114,10 @@ class _MyHomePageState extends State<MyHomePage> {
             label: 'Create',
           ),
           BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_month),
+            label: 'Requests',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Profile',
           ),
@@ -126,6 +131,8 @@ class _MyHomePageState extends State<MyHomePage> {
       return buildHomePage();
     } else if (selectedIndex == 1) {
       return buildCreateListingPage();
+    } else if (selectedIndex == 2) {
+      return const RequestScreen();
     } else {
       return buildProfilePage();
     }
