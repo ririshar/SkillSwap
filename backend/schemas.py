@@ -64,3 +64,19 @@ class ListingsResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class RequestCreate(BaseModel):
+    listing_id: int
+    requester_name: str
+    message: str | None = None
+
+
+class RequestResponse(BaseModel):
+    id: int
+    listing_id: int
+    requester_name: str
+    message: str | None = None
+    status: str
+
+    class Config:
+        from_attributes = True
