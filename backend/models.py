@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Integer, String, Float
-from sqlalchemy.orm import declarative_base
+from .database import Base
 from datetime import datetime
 from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+
 
 class User(Base):
     __tablename__ = "users"
