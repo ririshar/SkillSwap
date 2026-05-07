@@ -6,8 +6,9 @@ from .. import models, schemas, database
 router = APIRouter()
 
 @router.get("/")
-async def get_listings():
-    return {"message": "List of listings"}
+def get_listings(db: Session = Depends(database.get_db)):
+    listings = db.query(models.Listing).all()
+    return listings
 
 
 @router.post("/",response_model=schemas.ListingsResponse, status_code=201)
