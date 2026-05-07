@@ -48,6 +48,7 @@ class _RequestScreenState extends State<RequestScreen> {
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 20),
+
         for (int i = 0; i < requestTitles.length; i++)
           Card(
             margin: const EdgeInsets.only(bottom: 12),
@@ -68,6 +69,7 @@ class _RequestScreenState extends State<RequestScreen> {
                   Text('Time: ${requestTimes[i]}'),
                   Text('Status: ${requestStatuses[i]}'),
                   const SizedBox(height: 12),
+
                   if (requestStatuses[i] == 'Pending')
                     Row(
                       children: [
