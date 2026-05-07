@@ -33,6 +33,11 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int selectedIndex = 0;
 
+  final titleController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final tagsController = TextEditingController();
+  final availabilityController = TextEditingController();
+
   final List<String> skillTitles = [
     'Python Programming Help',
     'Spanish Conversation Practice',
@@ -57,10 +62,54 @@ class _MyHomePageState extends State<MyHomePage> {
     'Available Fri 16:00',
   ];
 
+  @override
+  void dispose() {
+    titleController.dispose();
+    descriptionController.dispose();
+    tagsController.dispose();
+    availabilityController.dispose();
+    super.dispose();
+  }
+
   void changePage(int index) {
     setState(() {
       selectedIndex = index;
     });
+  }
+
+  void createListing() {
+    final title = titleController.text.trim();
+    final description = descriptionController.text.trim();
+    final tags = tagsController.text.trim();
+    final availability = availabilityController.text.trim();
+
+    if (title.isEmpty ||
+        description.isEmpty ||
+        tags.isEmpty ||
+        availability.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
+    setState(() {
+      skillTitles.add(title);
+      skillDescriptions.add('$description\nTags: $tags');
+      skillLevels.add('Beginner');
+      skillTimes.add('Available $availability');
+
+      titleController.clear();
+      descriptionController.clear();
+      tagsController.clear();
+      availabilityController.clear();
+
+      selectedIndex = 0;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Listing created and added to Browse')),
+    );
   }
 
   @override
@@ -151,41 +200,41 @@ class _MyHomePageState extends State<MyHomePage> {
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20),
-          const TextField(
-            decoration: InputDecoration(
+          TextField(
+            controller: titleController,
+            decoration: const InputDecoration(
               labelText: 'Skill title',
               border: OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 12),
-          const TextField(
-            decoration: InputDecoration(
+          TextField(
+            controller: descriptionController,
+            decoration: const InputDecoration(
               labelText: 'Description',
               border: OutlineInputBorder(),
             ),
             maxLines: 3,
           ),
           const SizedBox(height: 12),
-          const TextField(
-            decoration: InputDecoration(
+          TextField(
+            controller: tagsController,
+            decoration: const InputDecoration(
               labelText: 'Tags, e.g. Coding, Python',
               border: OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 12),
-          const TextField(
-            decoration: InputDecoration(
+          TextField(
+            controller: availabilityController,
+            decoration: const InputDecoration(
               labelText: 'Availability, e.g. Tuesday 14:00',
               border: OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Listing created')),
-              );
-            },
+            onPressed: createListing,
             child: const Text('Create Listing'),
           ),
         ],
