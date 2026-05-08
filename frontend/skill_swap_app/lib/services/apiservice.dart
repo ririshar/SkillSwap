@@ -37,4 +37,34 @@ class ApiService {
       throw Exception('Failed to create listing');
     }
   }
+
+  static Future<void> createRequest({
+    required int listingId,
+    required String requesterName,
+    required String message,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/requests/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'listing_id': listingId,
+        'requester_name': requesterName,
+        'message': message,
+      }),
+    );
+
+    if (response.statusCode != 201) {
+      throw Exception('Failed to create request');
+    }
+  }
+
+  static Future<List<dynamic>> getRequests() async {
+    final response = await http.get(Uri.parse('$baseUrl/requests/'));
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to load requests');
+    }
+  }
 }
