@@ -11,6 +11,9 @@ class ListingScreen extends StatefulWidget {
 class _ListingScreenState extends State<ListingScreen> {
   late Future<List<dynamic>> listingsFuture;
 
+  final searchController = TextEditingController();
+  String selectedLevel = 'All';
+
   @override
   void initState() {
     super.initState();
@@ -21,6 +24,52 @@ class _ListingScreenState extends State<ListingScreen> {
     setState(() {
       listingsFuture = ApiService.getListings();
     });
+  }
+
+  Future<void> sendRequest(int listingId) async {
+    try {
+      await ApiService.createRequest(
+        listingId: listingId,
+        requesterName: 'Student User',
+        message: 'Hi, I would like to learn this skill.',
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Lesson request sent')),
+      );
+    } catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $error')),
+      );
+    }
+  }
+
+  List<dynamic> filterListings(List<dynamic> listings) {
+    final searchText = searchController.text.toLowerCase();
+
+    return listings.where((listing) {
+      final title = listing['title'].toString().toLowerCase();
+      final description = listing['description'].toString().toLowerCase();
+      final level = listing['level'].toString();
+
+      final matchesSearch =
+          title.contains(searchText) || description.contains(searchText);
+
+      final matchesLevel =
+          selectedLevel == 'All' || level == selectedLevel;
+
+      return matchesSearch && matchesLevel;
+    }).toList();
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -37,38 +86,128 @@ class _ListingScreenState extends State<ListingScreen> {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
 
-          final listings = snapshot.data ?? [];
+          final allListings = snapshot.data ?? [];
+          final filteredListings = filterListings(allListings);
 
-          if (listings.isEmpty) {
-            return const Center(child: Text('No listings yet.'));
-          }
-
-          return ListView.builder(
+          return Padding(
             padding: const EdgeInsets.all(16),
-            itemCount: listings.length,
-            itemBuilder: (context, index) {
-              final listing = listings[index];
-
-              return Card(
-                margin: const EdgeInsets.only(bottom: 12),
-                child: ListTile(
-                  leading: const Icon(Icons.school),
-                  title: Text(listing['title']),
-                  subtitle: Text(
-                    '${listing['description']}\nLevel: ${listing['level']}\nAvailable: ${listing['availability']}',
+            child: Column(
+              children: [
+                TextField(
+                  controller: searchController,
+                  decoration: const InputDecoration(
+                    labelText: 'Search for a skill',
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(),
                   ),
-                  isThreeLine: true,
-                  trailing: ElevatedButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Lesson request sent')),
-                      );
-                    },
-                    child: const Text('Request'),
-                  ),
+                  onChanged: (_) {
+                    setState(() {});
+                  },
                 ),
-              );
-            },
+
+                const SizedBox(height: 12),
+
+                DropdownButtonFormField<String>(
+                  initialValue: selectedLevel,
+                  decoration: const InputDecoration(
+                    labelText: 'Filter by level',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'All', child: Text('All')),
+                    DropdownMenuItem(value: 'Beginner', child: Text('Beginner')),
+                    DropdownMenuItem(
+                        value: 'Intermediate', child: Text('Intermediate')),
+                    DropdownMenuItem(value: 'Advanced', child: Text('Advanced')),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      selectedLevel = value!;
+                    });
+                  },
+                ),
+
+                const SizedBox(height: 16),
+
+                Expanded(
+                  child: filteredListings.isEmpty
+                      ? const Center(child: Text('No matching listings found.'))
+                      : RefreshIndicator(
+                          onRefresh: () async {
+                            refreshListings();
+                          },
+                          child: ListView.builder(
+                            itemCount: filteredListings.length,
+                            itemBuilder: (context, index) {
+                              final listing = filteredListings[index];
+
+                              return Card(
+                                margin: const EdgeInsets.only(bottom: 14),
+                                elevation: 3,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.school),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              listing['title'],
+                                              style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+                                      const SizedBox(height: 8),
+
+                                      Text(listing['description']),
+
+                                      const SizedBox(height: 10),
+
+                                      Wrap(
+                                        spacing: 8,
+                                        children: [
+                                          Chip(
+                                            label: Text(
+                                                'Level: ${listing['level']}'),
+                                          ),
+                                          Chip(
+                                            label: Text(
+                                                'Available: ${listing['availability']}'),
+                                          ),
+                                        ],
+                                      ),
+
+                                      const SizedBox(height: 10),
+
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: ElevatedButton.icon(
+                                          onPressed: () {
+                                            sendRequest(listing['id']);
+                                          },
+                                          icon: const Icon(Icons.send),
+                                          label: const Text('Request Lesson'),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                ),
+              ],
+            ),
           );
         },
       ),
