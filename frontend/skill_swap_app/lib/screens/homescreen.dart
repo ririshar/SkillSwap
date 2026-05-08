@@ -12,12 +12,19 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
+  final List<Map<String, dynamic>> sentRequests = [];
 
-  final pages = const [
-    ListingScreen(),
-    CreateListingScreen(),
-    RequestScreen(),
-  ];
+  late final List<Widget> pages;
+
+  @override
+  void initState() {
+    super.initState();
+    pages = [
+      const ListingScreen(),
+      const CreateListingScreen(),
+      RequestScreen(sentRequests: sentRequests),
+    ];
+  }
 
   final titles = const [
     'Browse Skills',
@@ -26,6 +33,13 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   void changePage(int index) {
+    if (index == 2) {
+      // Example: Add a new request when navigating to the Requests page
+      sentRequests.add({
+        'title': 'New Request',
+        'description': 'This is a new request.',
+      });
+    }
     setState(() {
       selectedIndex = index;
     });
