@@ -27,27 +27,73 @@ class _ListingScreenState extends State<ListingScreen> {
     });
   }
 
-  Future<void> sendRequest(int listingId) async {
-    try {
-      await ApiService.createRequest(
-        listingId: listingId,
-        requesterName: 'Student User',
-        message: 'Hi, I would like to learn this skill.',
-      );
+  Future<void> sendRequest(int listingId, String message) async {
+  try {
+    await ApiService.createRequest(
+      listingId: listingId,
+      requesterName: 'Student User',
+      message: message,
+    );
 
-      if (!mounted) return;
+    if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Lesson request sent')),
-      );
-    } catch (error) {
-      if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Lesson request sent')),
+    );
+  } catch (error) {
+    if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $error')),
-      );
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error: $error')),
+    );
   }
+}
+
+  void showRequestDialog(int listingId, String listingTitle) {
+  final messageController = TextEditingController();
+
+  showDialog(
+    context: context,
+    builder: (dialogContext) {
+      return AlertDialog(
+        title: Text('Request: $listingTitle'),
+        content: TextField(
+          controller: messageController,
+          maxLines: 4,
+          decoration: const InputDecoration(
+            labelText: 'Write your request message',
+            hintText: 'Hi, I would like help with this skill...',
+            border: OutlineInputBorder(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+            },
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final message = messageController.text.trim();
+
+              if (message.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please write a message')),
+                );
+                return;
+              }
+
+              Navigator.pop(dialogContext);
+              await sendRequest(listingId, message);
+            },
+            child: const Text('Send Request'),
+          ),
+        ],
+      );
+    },
+  );
+}
 
   List<dynamic> filterListings(List<dynamic> listings) {
     final searchText = searchController.text.toLowerCase();
@@ -193,8 +239,11 @@ class _ListingScreenState extends State<ListingScreen> {
                                         alignment: Alignment.centerRight,
                                         child: ElevatedButton.icon(
                                           onPressed: () {
-                                            sendRequest(listing['id']);
-                                          },
+                                            showRequestDialog(
+                                              listing['id'],
+                                              listing['title'],
+                                             );   
+                                        },            
                                           icon: const Icon(Icons.send),
                                           label: const Text('Request Lesson'),
                                         ),
