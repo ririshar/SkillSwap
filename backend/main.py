@@ -3,8 +3,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from .routers import users, listings, requests, chat
 from . import models
 from .database import engine
+from sqlalchemy import text
 
 models.Base.metadata.create_all(bind=engine)
+
+with engine.connect() as connection:
+    result = connection.execute(text("PRAGMA table_info(listings)"))
+    columns = [row[1] for row in result]
+
+    if "contact" not in columns:
+        connection.execute(text("ALTER TABLE listings ADD COLUMN contact VARCHAR DEFAULT ''"))
+        connection.commit()
+
 
 app = FastAPI(
     title="Skills Swap",

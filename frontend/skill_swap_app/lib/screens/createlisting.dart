@@ -71,7 +71,9 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
 
     if (descriptionController.text.trim().length > 150) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Description must be 150 characters or less')),
+        const SnackBar(
+          content: Text('Description must be 150 characters or less'),
+        ),
       );
       return;
     }
@@ -106,9 +108,9 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     } catch (error) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $error')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $error')));
     }
 
     if (!mounted) return;
@@ -123,6 +125,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     titleController.dispose();
     descriptionController.dispose();
     super.dispose();
+    contactController.dispose();
   }
 
   @override
@@ -148,7 +151,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                 border: OutlineInputBorder(),
               ),
             ),
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
             TextField(
               controller: contactController,
@@ -160,8 +163,8 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                 prefixIcon: Icon(Icons.contact_mail),
               ),
             ),
-          
-          const SizedBox(height: 12),
+
+            const SizedBox(height: 12),
 
             TextField(
               controller: descriptionController,
@@ -194,7 +197,10 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
               ),
               items: const [
                 DropdownMenuItem(value: 'Beginner', child: Text('Beginner')),
-                DropdownMenuItem(value: 'Intermediate', child: Text('Intermediate')),
+                DropdownMenuItem(
+                  value: 'Intermediate',
+                  child: Text('Intermediate'),
+                ),
                 DropdownMenuItem(value: 'Advanced', child: Text('Advanced')),
               ],
               onChanged: (value) {
