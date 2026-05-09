@@ -95,6 +95,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
 
       titleController.clear();
       descriptionController.clear();
+      contactController.clear();
 
       setState(() {
         selectedLevel = 'Beginner';
@@ -153,7 +154,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             ),
             const SizedBox(height: 12),
 
-            TextField(
+             TextField(
               controller: contactController,
               maxLines: 2,
               decoration: const InputDecoration(
@@ -162,7 +163,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.contact_mail),
               ),
-            ),
+            ),  
 
             const SizedBox(height: 12),
 

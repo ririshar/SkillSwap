@@ -36,7 +36,7 @@ class ApiService {
     );
 
     if (response.statusCode != 201) {
-      throw Exception('Failed to create listing');
+      throw Exception('Failed to create listing: ${response.body}');
     }
   }
 

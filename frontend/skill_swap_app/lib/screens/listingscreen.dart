@@ -286,7 +286,11 @@ class _ListingScreenState extends State<ListingScreen> {
                                               'Available: ${listing['availability']}',
                                             ),
                                           ),
-
+                                          
+                                          
+                                          if (listing.containsKey('contact') &&
+                                            listing['contact'] != null &&
+                                            listing['contact'].toString().trim().isNotEmpty)
                                           Chip(
                                             label: Text(
                                               'Contact: ${listing['contact']}',

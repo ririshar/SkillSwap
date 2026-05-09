@@ -52,7 +52,7 @@ class ListingsCreate(BaseModel):
     price: float = 0.0
     level: str = "Beginner"
     availability: str = "Flexible"
-    #contact: str = ""
+    contact: str = ""
 
 
 class ListingsResponse(BaseModel):
