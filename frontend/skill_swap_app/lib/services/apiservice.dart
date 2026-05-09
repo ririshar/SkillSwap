@@ -96,4 +96,14 @@ static Future<void> deleteRequest(int requestId) async {
     throw Exception('Failed to delete request');
   }
  }
+
+ static Future<void> deleteListing(int listingId) async {
+  final response = await http.delete(
+    Uri.parse('$baseUrl/listings/$listingId'),
+  );
+
+  if (response.statusCode != 204) {
+    throw Exception('Failed to delete listing');
+  }
+ }
 }

@@ -27,6 +27,26 @@ class _ListingScreenState extends State<ListingScreen> {
     });
   }
 
+  Future<void> deleteListing(int listingId) async {
+  try {
+    await ApiService.deleteListing(listingId);
+
+    refreshListings();
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Listing deleted')),
+    );
+  } catch (error) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error: $error')),
+    );
+  }
+}
+
   Future<void> sendRequest(int listingId, String message) async {
   try {
     await ApiService.createRequest(
@@ -237,17 +257,31 @@ class _ListingScreenState extends State<ListingScreen> {
 
                                       Align(
                                         alignment: Alignment.centerRight,
-                                        child: ElevatedButton.icon(
-                                          onPressed: () {
-                                            showRequestDialog(
-                                              listing['id'],
-                                              listing['title'],
-                                             );   
-                                        },            
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                           ElevatedButton.icon(
+                                            onPressed: () {
+                                              showRequestDialog(
+                                                listing['id'],
+                                                listing['title'],
+                                              );        
+                                            },          
                                           icon: const Icon(Icons.send),
-                                          label: const Text('Request Lesson'),
+                                          label: const Text('Request'),
                                         ),
-                                      ),
+
+                                        const SizedBox(width: 8),
+
+                                        IconButton(
+                                          onPressed: () {
+                                            deleteListing(listing['id']);
+                                          },
+                                          icon: const Icon(Icons.delete),
+                                        ),
+                                      ],
+                                    ),
+                                    ),
                                     ],
                                   ),
                                 ),
