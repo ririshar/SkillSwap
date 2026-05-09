@@ -23,6 +23,21 @@ class _RequestScreenState extends State<RequestScreen> {
     });
   }
 
+  Future<void> acceptRequest(int requestId) async {
+    await ApiService.acceptRequest(requestId);
+    refreshRequests();
+  }
+
+  Future<void> rejectRequest(int requestId) async {
+    await ApiService.rejectRequest(requestId);
+    refreshRequests();
+  }
+
+  Future<void> deleteRequest(int requestId) async {
+    await ApiService.deleteRequest(requestId);
+    refreshRequests();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,18 +63,77 @@ class _RequestScreenState extends State<RequestScreen> {
             itemCount: requests.length,
             itemBuilder: (context, index) {
               final request = requests[index];
+              final requestId = request['id'];
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
-                child: ListTile(
-                  leading: const Icon(Icons.mail),
-                  title: Text('Request for listing ID: ${request['listing_id']}'),
-                  subtitle: Text(
-                    'From: ${request['requester_name']}\n'
-                    'Message: ${request['message'] ?? 'No message'}\n'
-                    'Status: ${request['status']}',
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Request #$requestId',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text('Listing ID: ${request['listing_id']}'),
+                      Text('From: ${request['requester_name']}'),
+                      Text('Message: ${request['message'] ?? 'No message'}'),
+                      Text('Status: ${request['status']}'),
+                      const SizedBox(height: 12),
+
+                      Row(
+                        children: [
+                          ElevatedButton(
+                            onPressed: () async {
+                              try {
+                                await acceptRequest(requestId);
+                                if (!context.mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Request accepted')),
+                                );
+                              } catch (error) {
+                                if (!context.mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Error: $error')),
+                                );
+                              }
+                            },
+                            child: const Text('Accept'),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: () async {
+                              try {
+                                await rejectRequest(requestId);
+                                if (!context.mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Request rejected')),
+                                );
+                              } catch (error) {
+                                if (!context.mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Error: $error')),
+                                );
+                              }
+                            },
+                            child: const Text('Reject'),
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            onPressed: () async {
+                              await deleteRequest(requestId);
+                            },
+                            icon: const Icon(Icons.delete),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  isThreeLine: true,
                 ),
               );
             },
