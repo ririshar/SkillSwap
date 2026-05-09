@@ -67,4 +67,33 @@ class ApiService {
       throw Exception('Failed to load requests');
     }
   }
+  static Future<void> acceptRequest(int requestId) async {
+  final response = await http.put(
+    Uri.parse('$baseUrl/requests/$requestId/accept'),
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception('Failed to accept request');
+  }
+}
+
+static Future<void> rejectRequest(int requestId) async {
+  final response = await http.put(
+    Uri.parse('$baseUrl/requests/$requestId/reject'),
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception('Failed to reject request');
+  }
+}
+
+static Future<void> deleteRequest(int requestId) async {
+  final response = await http.delete(
+    Uri.parse('$baseUrl/requests/$requestId'),
+  );
+
+  if (response.statusCode != 204) {
+    throw Exception('Failed to delete request');
+  }
+ }
 }
