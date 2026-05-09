@@ -11,6 +11,7 @@ class CreateListingScreen extends StatefulWidget {
 class _CreateListingScreenState extends State<CreateListingScreen> {
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
+  final contactController = TextEditingController();
 
   String selectedLevel = 'Beginner';
   DateTime? selectedDate;
@@ -85,6 +86,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
         description: descriptionController.text.trim(),
         level: selectedLevel,
         availability: getAvailabilityText(),
+        contact: contactController.text.trim(),
       );
 
       if (!mounted) return;
@@ -146,8 +148,20 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                 border: OutlineInputBorder(),
               ),
             ),
+          const SizedBox(height: 12),
 
-            const SizedBox(height: 12),
+            TextField(
+              controller: contactController,
+              maxLines: 2,
+              decoration: const InputDecoration(
+                labelText: 'Contact details',
+                hintText: 'Discord, Instagram, email, etc.',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.contact_mail),
+              ),
+            ),
+          
+          const SizedBox(height: 12),
 
             TextField(
               controller: descriptionController,

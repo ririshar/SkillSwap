@@ -277,11 +277,20 @@ class _ListingScreenState extends State<ListingScreen> {
                                         children: [
                                           Chip(
                                             label: Text(
-                                                'Level: ${listing['level']}'),
+                                              'Level: ${listing['level']}',
+                                            ),
                                           ),
+
                                           Chip(
                                             label: Text(
-                                                'Available: ${listing['availability']}'),
+                                              'Available: ${listing['availability']}',
+                                            ),
+                                          ),
+
+                                          Chip(
+                                            label: Text(
+                                              'Contact: ${listing['contact']}',
+                                            ),
                                           ),
                                         ],
                                       ),

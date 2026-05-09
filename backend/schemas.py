@@ -52,6 +52,7 @@ class ListingsCreate(BaseModel):
     price: float = 0.0
     level: str = "Beginner"
     availability: str = "Flexible"
+    contact: str
 
 
 class ListingsResponse(BaseModel):
@@ -61,6 +62,7 @@ class ListingsResponse(BaseModel):
     price: float
     level: str
     availability: str
+    contact: str
 
     class Config:
         from_attributes = True

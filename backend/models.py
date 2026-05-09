@@ -22,6 +22,7 @@ class Listing(Base):
     price = Column(Float, default=0.0)
     level = Column(String, default="Beginner")
     availability = Column(String, default="Flexible")
+    contact = Column(String, default="")
 
 
 class Request(Base):

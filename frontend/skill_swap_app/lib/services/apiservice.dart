@@ -19,6 +19,7 @@ class ApiService {
     required String description,
     required String level,
     required String availability,
+    required String contact,
     double price = 0,
   }) async {
     final response = await http.post(
@@ -30,6 +31,7 @@ class ApiService {
         'price': price,
         'level': level,
         'availability': availability,
+        'contact': contact,
       }),
     );
 
