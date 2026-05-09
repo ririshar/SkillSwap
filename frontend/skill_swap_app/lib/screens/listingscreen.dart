@@ -47,11 +47,15 @@ class _ListingScreenState extends State<ListingScreen> {
   }
 }
 
-  Future<void> sendRequest(int listingId, String message) async {
+  Future<void> sendRequest(
+  int listingId,
+  String requesterName,
+  String message,
+) async {
   try {
     await ApiService.createRequest(
       listingId: listingId,
-      requesterName: 'Student User',
+      requesterName: requesterName,
       message: message,
     );
 
@@ -68,8 +72,8 @@ class _ListingScreenState extends State<ListingScreen> {
     );
   }
 }
-
-  void showRequestDialog(int listingId, String listingTitle) {
+ void showRequestDialog(int listingId, String listingTitle) {
+  final nameController = TextEditingController();
   final messageController = TextEditingController();
 
   showDialog(
@@ -77,15 +81,35 @@ class _ListingScreenState extends State<ListingScreen> {
     builder: (dialogContext) {
       return AlertDialog(
         title: Text('Request: $listingTitle'),
-        content: TextField(
-          controller: messageController,
-          maxLines: 4,
-          decoration: const InputDecoration(
-            labelText: 'Write your request message',
-            hintText: 'Hi, I would like help with this skill...',
-            border: OutlineInputBorder(),
+
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Your name',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              TextField(
+                controller: messageController,
+                maxLines: 4,
+                decoration: const InputDecoration(
+                  labelText: 'Request message',
+                  hintText: 'Hi, I would like help with this skill...',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
           ),
         ),
+
         actions: [
           TextButton(
             onPressed: () {
@@ -93,19 +117,28 @@ class _ListingScreenState extends State<ListingScreen> {
             },
             child: const Text('Cancel'),
           ),
+
           ElevatedButton(
             onPressed: () async {
+              final requesterName = nameController.text.trim();
               final message = messageController.text.trim();
 
-              if (message.isEmpty) {
+              if (requesterName.isEmpty || message.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please write a message')),
+                  const SnackBar(
+                    content: Text('Please fill in all fields'),
+                  ),
                 );
                 return;
               }
 
               Navigator.pop(dialogContext);
-              await sendRequest(listingId, message);
+
+              await sendRequest(
+                listingId,
+                requesterName,
+                message,
+              );
             },
             child: const Text('Send Request'),
           ),
