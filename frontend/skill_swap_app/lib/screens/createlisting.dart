@@ -11,20 +11,67 @@ class CreateListingScreen extends StatefulWidget {
 class _CreateListingScreenState extends State<CreateListingScreen> {
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
-  final availabilityController = TextEditingController();
 
   String selectedLevel = 'Beginner';
+  DateTime? selectedDate;
+  TimeOfDay? selectedTime;
   bool isLoading = false;
 
+  Future<void> pickDate() async {
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now().add(const Duration(days: 1)),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2030),
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        selectedDate = pickedDate;
+      });
+    }
+  }
+
+  Future<void> pickTime() async {
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (pickedTime != null) {
+      setState(() {
+        selectedTime = pickedTime;
+      });
+    }
+  }
+
+  String getAvailabilityText() {
+    if (selectedDate == null || selectedTime == null) {
+      return '';
+    }
+
+    final date =
+        '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}';
+    final time = selectedTime!.format(context);
+
+    return '$date at $time';
+  }
+
   Future<void> submitListing() async {
-    if (titleController.text.isEmpty ||
-        descriptionController.text.isEmpty ||
-        availabilityController.text.isEmpty) {
-      if (mounted) {
+    if (titleController.text.trim().isEmpty ||
+        descriptionController.text.trim().isEmpty ||
+        selectedDate == null ||
+        selectedTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
       );
-  }
+      return;
+    }
+
+    if (descriptionController.text.trim().length > 150) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Description must be 150 characters or less')),
+      );
       return;
     }
 
@@ -34,47 +81,52 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
 
     try {
       await ApiService.createListing(
-        title: titleController.text,
-        description: descriptionController.text,
+        title: titleController.text.trim(),
+        description: descriptionController.text.trim(),
         level: selectedLevel,
-        availability: availabilityController.text,
+        availability: getAvailabilityText(),
       );
+
+      if (!mounted) return;
 
       titleController.clear();
       descriptionController.clear();
-      availabilityController.clear();
 
+      setState(() {
+        selectedLevel = 'Beginner';
+        selectedDate = null;
+        selectedTime = null;
+      });
 
-    if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Listing created successfully')),
       );
-    }
     } catch (error) {
-      if (mounted) {
+      if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $error')),
       );
     }
-  } 
 
-  if (mounted) {
+    if (!mounted) return;
+
     setState(() {
       isLoading = false;
     });
   }
-}
 
   @override
   void dispose() {
     titleController.dispose();
     descriptionController.dispose();
-    availabilityController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final descriptionLength = descriptionController.text.length;
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -84,6 +136,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
               'Create Skill Listing',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
+
             const SizedBox(height: 20),
 
             TextField(
@@ -93,16 +146,30 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                 border: OutlineInputBorder(),
               ),
             ),
+
             const SizedBox(height: 12),
 
             TextField(
               controller: descriptionController,
               maxLines: 3,
+              maxLength: 150,
+              onChanged: (_) {
+                setState(() {});
+              },
               decoration: const InputDecoration(
                 labelText: 'Description',
+                hintText: 'Briefly explain what the skill session is about',
                 border: OutlineInputBorder(),
               ),
             ),
+
+            Text(
+              '$descriptionLength / 150 characters',
+              style: TextStyle(
+                color: descriptionLength > 150 ? Colors.red : Colors.grey,
+              ),
+            ),
+
             const SizedBox(height: 12),
 
             DropdownButtonFormField<String>(
@@ -122,15 +189,31 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                 });
               },
             ),
-            const SizedBox(height: 12),
 
-            TextField(
-              controller: availabilityController,
-              decoration: const InputDecoration(
-                labelText: 'Availability (e.g. Tuesday 14:00)',
-                border: OutlineInputBorder(),
+            const SizedBox(height: 16),
+
+            OutlinedButton.icon(
+              onPressed: pickDate,
+              icon: const Icon(Icons.calendar_month),
+              label: Text(
+                selectedDate == null
+                    ? 'Pick availability date'
+                    : 'Date: ${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}',
               ),
             ),
+
+            const SizedBox(height: 8),
+
+            OutlinedButton.icon(
+              onPressed: pickTime,
+              icon: const Icon(Icons.access_time),
+              label: Text(
+                selectedTime == null
+                    ? 'Pick availability time'
+                    : 'Time: ${selectedTime!.format(context)}',
+              ),
+            ),
+
             const SizedBox(height: 20),
 
             ElevatedButton(
