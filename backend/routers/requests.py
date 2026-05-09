@@ -4,9 +4,9 @@ from .. import models, schemas, database
 
 router = APIRouter()
 
-@router.get("/")
-async def get_requests():
-    return {"message": "List of requests"}
+@router.get("/", response_model=list[schemas.RequestResponse])
+def get_requests(db: Session = Depends(database.get_db)):
+    return db.query(models.Request).all()
 
 @router.post("/", response_model=schemas.RequestResponse, status_code=status.HTTP_201_CREATED)
 def create_request(
