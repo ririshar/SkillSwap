@@ -1,62 +1,32 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-//import 'package:skill_swap_app/main.dart';
-
-// Define a basic MyApp class for testing purposes
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  int counter = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: Text('Skill Swap App')),
-        body: Center(child: Text('0')),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            if (mounted) {
-              setState(() {
-                counter++;
-              });
-            }
-          },
-          child: const Icon(Icons.add),
-        ),
-      ),
-    );
-  }
-}
+import 'package:skill_swap_app/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(MyApp());
+  testWidgets('App loads and shows Listings page', (WidgetTester tester) async {
+    await tester.pumpWidget(const SkillSwapApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.text('Browse Skills'), findsOneWidget);
+    expect(find.text('Listings'), findsOneWidget);
+    expect(find.text('Create'), findsOneWidget);
+    expect(find.text('Requests'), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  testWidgets('Can navigate to Create page', (WidgetTester tester) async {
+    await tester.pumpWidget(const SkillSwapApp());
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    await tester.tap(find.text('Create'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Create Listing'), findsOneWidget);
+  });
+
+  testWidgets('Can navigate to Requests page', (WidgetTester tester) async {
+    await tester.pumpWidget(const SkillSwapApp());
+
+    await tester.tap(find.text('Requests'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Requests'), findsWidgets);
   });
 }
