@@ -22,4 +22,5 @@ def get_db():
     try:
         yield db
     finally:
-        db.close()
+        db.close() 
+ #creates the connection to the SQLite database and gives the app a way to access it safely

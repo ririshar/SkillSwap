@@ -32,4 +32,6 @@ class Request(Base):
     listing_id = Column(Integer, nullable=False)
     requester_name = Column(String, nullable=False)
     message = Column(String, nullable=True)
-    status = Column(String, default="pending")
+    status = Column(String, default="pending") 
+
+# this file defines the database models for the application, including User, Listing, and Request. Each model corresponds to a table in the database and defines the structure of that table.

@@ -3,6 +3,8 @@ import 'listingscreen.dart';
 import 'createlisting.dart';
 import 'requestscreen.dart';
 
+// The HomeScreen is the main screen of the app that contains a bottom navigation bar to switch between the three main sections:
+// Browse Skills, Create Listing, and Requests. 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 

@@ -38,3 +38,4 @@ app.include_router(chat.router, prefix="/chat", tags=["chat"])
 @app.get("/")
 async def root():
     return {"message": "Skills Swap API is still running!"}
+# starts the backend API, connects the database models

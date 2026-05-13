@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/apiservice.dart';
-
+// this screen allows users to create a new skill listing by filling out a form with the skill title, description, skill level, availability date and time, and contact details.//
+// It includes validation to ensure all fields are filled out correctly and provides feedback to the user upon successful creation or if there are any errors.  
 class CreateListingScreen extends StatefulWidget {
   const CreateListingScreen({super.key});
 

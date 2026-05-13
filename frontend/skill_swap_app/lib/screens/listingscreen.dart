@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/apiservice.dart';
-
+// this screen displays the list of skill listings that users can browse through. It includes a search bar to filter listings by skill name or description, and a dropdown to filter by skill level (beginner, intermediate, advanced). Each listing card shows the skill title, description, level, availability, and contact details if provided. Users can also send a request to the listing owner directly from this screen or delete their own listings. The screen fetches the listings from the backend API and updates in real-time when changes are made.
 
 class ListingScreen extends StatefulWidget {
   const ListingScreen({super.key});

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
+// this file defines the ApiService class, which contains static methods for making HTTP requests to the backend API.
+// It includes methods for fetching listings and requests, creating new listings and requests, and updating or deleting existing requests and listings. The ApiService class abstracts away the details of making HTTP requests and provides a simple interface for the rest of the app to interact with the backend API.
 class ApiService {
   static const String baseUrl = 'http://127.0.0.1:8000';
 

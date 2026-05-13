@@ -82,3 +82,6 @@ class RequestResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+# This file defines the Pydantic models (schemas) used for data validation and serialization in the FastAPI application. 
+# These schemas are used to define the structure of the data that is sent and received through the API endpoints, ensuring that the data conforms to the expected format.
