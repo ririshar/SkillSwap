@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-// this file defines the ApiService class, which contains static methods for making HTTP requests to the backend API.
-// It includes methods for fetching listings and requests, creating new listings and requests, and updating or deleting existing requests and listings. The ApiService class abstracts away the details of making HTTP requests and provides a simple interface for the rest of the app to interact with the backend API.
+
+// This file handles the connection between the Flutter app and the backend API
 class ApiService {
+  // Base URL for the FastAPI backend
   static const String baseUrl = 'http://127.0.0.1:8000';
 
+  // Gets all listings from the backend
   static Future<List<dynamic>> getListings() async {
     final response = await http.get(Uri.parse('$baseUrl/listings/'));
 
@@ -15,6 +17,7 @@ class ApiService {
     }
   }
 
+  // Sends a new listing to the backend
   static Future<void> createListing({
     required String title,
     required String description,
@@ -41,6 +44,7 @@ class ApiService {
     }
   }
 
+  // Sends a new lesson request to the backend
   static Future<void> createRequest({
     required int listingId,
     required String requesterName,
@@ -61,6 +65,7 @@ class ApiService {
     }
   }
 
+  // Gets all lesson requests from the backend
   static Future<List<dynamic>> getRequests() async {
     final response = await http.get(Uri.parse('$baseUrl/requests/'));
 
@@ -70,43 +75,48 @@ class ApiService {
       throw Exception('Failed to load requests');
     }
   }
+
+  // Updates a request status to accepted
   static Future<void> acceptRequest(int requestId) async {
-  final response = await http.put(
-    Uri.parse('$baseUrl/requests/$requestId/accept'),
-  );
+    final response = await http.put(
+      Uri.parse('$baseUrl/requests/$requestId/accept'),
+    );
 
-  if (response.statusCode != 200) {
-    throw Exception('Failed to accept request');
+    if (response.statusCode != 200) {
+      throw Exception('Failed to accept request');
+    }
   }
-}
 
-static Future<void> rejectRequest(int requestId) async {
-  final response = await http.put(
-    Uri.parse('$baseUrl/requests/$requestId/reject'),
-  );
+  // Updates a request status to rejected
+  static Future<void> rejectRequest(int requestId) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/requests/$requestId/reject'),
+    );
 
-  if (response.statusCode != 200) {
-    throw Exception('Failed to reject request');
+    if (response.statusCode != 200) {
+      throw Exception('Failed to reject request');
+    }
   }
-}
 
-static Future<void> deleteRequest(int requestId) async {
-  final response = await http.delete(
-    Uri.parse('$baseUrl/requests/$requestId'),
-  );
+  // Deletes a request from the backend
+  static Future<void> deleteRequest(int requestId) async {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/requests/$requestId'),
+    );
 
-  if (response.statusCode != 204) {
-    throw Exception('Failed to delete request');
+    if (response.statusCode != 204) {
+      throw Exception('Failed to delete request');
+    }
   }
- }
 
- static Future<void> deleteListing(int listingId) async {
-  final response = await http.delete(
-    Uri.parse('$baseUrl/listings/$listingId'),
-  );
+  // Deletes a listing from the backend
+  static Future<void> deleteListing(int listingId) async {
+    final response = await http.delete(
+      Uri.parse('$baseUrl/listings/$listingId'),
+    );
 
-  if (response.statusCode != 204) {
-    throw Exception('Failed to delete listing');
+    if (response.statusCode != 204) {
+      throw Exception('Failed to delete listing');
+    }
   }
- }
 }
