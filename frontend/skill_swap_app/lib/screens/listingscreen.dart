@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/apiservice.dart';
-// this screen displays the list of skill listings that users can browse through. It includes a search bar to filter listings by skill name or description, and a dropdown to filter by skill level (beginner, intermediate, advanced). Each listing card shows the skill title, description, level, availability, and contact details if provided. Users can also send a request to the listing owner directly from this screen or delete their own listings. The screen fetches the listings from the backend API and updates in real-time when changes are made.
 
+// This screen shows all the skill listings from the backend
 class ListingScreen extends StatefulWidget {
   const ListingScreen({super.key});
 
@@ -10,144 +10,159 @@ class ListingScreen extends StatefulWidget {
 }
 
 class _ListingScreenState extends State<ListingScreen> {
+  // Stores the future list of listings from the backend
   late Future<List<dynamic>> listingsFuture;
 
+  // Controller for the search input
   final searchController = TextEditingController();
+
+  // Stores the selected level filter
   String selectedLevel = 'All';
 
   @override
   void initState() {
     super.initState();
+
+    // Loads listings when the screen first opens
     listingsFuture = ApiService.getListings();
   }
 
+  // Reloads the listings from the backend
   void refreshListings() {
     setState(() {
       listingsFuture = ApiService.getListings();
     });
   }
 
+  // Deletes a listing and refreshes the list
   Future<void> deleteListing(int listingId) async {
-  try {
-    await ApiService.deleteListing(listingId);
+    try {
+      await ApiService.deleteListing(listingId);
 
-    refreshListings();
+      refreshListings();
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Listing deleted')),
-    );
-  } catch (error) {
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error: $error')),
-    );
-  }
-}
-
-  Future<void> sendRequest(
-  int listingId,
-  String requesterName,
-  String message,
-) async {
-  try {
-    await ApiService.createRequest(
-      listingId: listingId,
-      requesterName: requesterName,
-      message: message,
-    );
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Lesson request sent')),
-    );
-  } catch (error) {
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error: $error')),
-    );
-  }
-}
- void showRequestDialog(int listingId, String listingTitle) {
-  final nameController = TextEditingController();
-  final messageController = TextEditingController();
-
-  showDialog(
-    context: context,
-    builder: (dialogContext) {
-      return AlertDialog(
-        title: Text('Request: $listingTitle'),
-
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Your name',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              TextField(
-                controller: messageController,
-                maxLines: 4,
-                decoration: const InputDecoration(
-                  labelText: 'Request message',
-                  hintText: 'Hi, I would like help with this skill...',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-            },
-            child: const Text('Cancel'),
-          ),
-
-          ElevatedButton(
-            onPressed: () async {
-              final requesterName = nameController.text.trim();
-              final message = messageController.text.trim();
-
-              if (requesterName.isEmpty || message.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Please fill in all fields'),
-                  ),
-                );
-                return;
-              }
-
-              Navigator.pop(dialogContext);
-
-              await sendRequest(
-                listingId,
-                requesterName,
-                message,
-              );
-            },
-            child: const Text('Send Request'),
-          ),
-        ],
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Listing deleted')),
       );
-    },
-  );
-}
+    } catch (error) {
+      if (!mounted) return;
 
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $error')),
+      );
+    }
+  }
+
+  // Sends a lesson request for a listing
+  Future<void> sendRequest(
+    int listingId,
+    String requesterName,
+    String message,
+  ) async {
+    try {
+      await ApiService.createRequest(
+        listingId: listingId,
+        requesterName: requesterName,
+        message: message,
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Lesson request sent')),
+      );
+    } catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $error')),
+      );
+    }
+  }
+
+  // Shows a pop up form for sending a request
+  void showRequestDialog(int listingId, String listingTitle) {
+    final nameController = TextEditingController();
+    final messageController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text('Request: $listingTitle'),
+
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Input for the requester's name
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Your name',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Input for the request message
+                TextField(
+                  controller: messageController,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    labelText: 'Request message',
+                    hintText: 'Hi, I would like help with this skill...',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          actions: [
+            // Closes the request form
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Cancel'),
+            ),
+
+            // Sends the request after checking the fields
+            ElevatedButton(
+              onPressed: () async {
+                final requesterName = nameController.text.trim();
+                final message = messageController.text.trim();
+
+                if (requesterName.isEmpty || message.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please fill in all fields'),
+                    ),
+                  );
+                  return;
+                }
+
+                Navigator.pop(dialogContext);
+
+                await sendRequest(
+                  listingId,
+                  requesterName,
+                  message,
+                );
+              },
+              child: const Text('Send Request'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Filters listings using the search text and selected level
   List<dynamic> filterListings(List<dynamic> listings) {
     final searchText = searchController.text.toLowerCase();
 
@@ -159,8 +174,7 @@ class _ListingScreenState extends State<ListingScreen> {
       final matchesSearch =
           title.contains(searchText) || description.contains(searchText);
 
-      final matchesLevel =
-          selectedLevel == 'All' || level == selectedLevel;
+      final matchesLevel = selectedLevel == 'All' || level == selectedLevel;
 
       return matchesSearch && matchesLevel;
     }).toList();
@@ -168,6 +182,7 @@ class _ListingScreenState extends State<ListingScreen> {
 
   @override
   void dispose() {
+    // Disposes the search controller when the screen closes
     searchController.dispose();
     super.dispose();
   }
@@ -178,21 +193,26 @@ class _ListingScreenState extends State<ListingScreen> {
       body: FutureBuilder<List<dynamic>>(
         future: listingsFuture,
         builder: (context, snapshot) {
+          // Shows a loading icon while listings are loading
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
+          // Shows an error message if listings fail to load
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
 
           final allListings = snapshot.data ?? [];
+
+          // Applies search and level filters
           final filteredListings = filterListings(allListings);
 
           return Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
+                // Search bar for filtering listings
                 TextField(
                   controller: searchController,
                   decoration: const InputDecoration(
@@ -207,6 +227,7 @@ class _ListingScreenState extends State<ListingScreen> {
 
                 const SizedBox(height: 12),
 
+                // Dropdown for filtering by skill level
                 DropdownButtonFormField<String>(
                   initialValue: selectedLevel,
                   decoration: const InputDecoration(
@@ -217,7 +238,9 @@ class _ListingScreenState extends State<ListingScreen> {
                     DropdownMenuItem(value: 'All', child: Text('All')),
                     DropdownMenuItem(value: 'Beginner', child: Text('Beginner')),
                     DropdownMenuItem(
-                        value: 'Intermediate', child: Text('Intermediate')),
+                      value: 'Intermediate',
+                      child: Text('Intermediate'),
+                    ),
                     DropdownMenuItem(value: 'Advanced', child: Text('Advanced')),
                   ],
                   onChanged: (value) {
@@ -241,6 +264,7 @@ class _ListingScreenState extends State<ListingScreen> {
                             itemBuilder: (context, index) {
                               final listing = filteredListings[index];
 
+                              // Card for each listing
                               return Card(
                                 margin: const EdgeInsets.only(bottom: 14),
                                 elevation: 3,
@@ -250,6 +274,7 @@ class _ListingScreenState extends State<ListingScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
+                                      // Shows the listing title
                                       Row(
                                         children: [
                                           const Icon(Icons.school),
@@ -268,10 +293,12 @@ class _ListingScreenState extends State<ListingScreen> {
 
                                       const SizedBox(height: 8),
 
+                                      // Shows the listing description
                                       Text(listing['description']),
 
                                       const SizedBox(height: 10),
 
+                                      // Shows listing details such as level and availability
                                       Wrap(
                                         spacing: 8,
                                         children: [
@@ -286,16 +313,19 @@ class _ListingScreenState extends State<ListingScreen> {
                                               'Available: ${listing['availability']}',
                                             ),
                                           ),
-                                          
-                                          
+
+                                          // Shows contact details if they exist
                                           if (listing.containsKey('contact') &&
-                                            listing['contact'] != null &&
-                                            listing['contact'].toString().trim().isNotEmpty)
-                                          Chip(
-                                            label: Text(
-                                              'Contact: ${listing['contact']}',
+                                              listing['contact'] != null &&
+                                              listing['contact']
+                                                  .toString()
+                                                  .trim()
+                                                  .isNotEmpty)
+                                            Chip(
+                                              label: Text(
+                                                'Contact: ${listing['contact']}',
+                                              ),
                                             ),
-                                          ),
                                         ],
                                       ),
 
@@ -306,28 +336,30 @@ class _ListingScreenState extends State<ListingScreen> {
                                         child: Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                           ElevatedButton.icon(
-                                            onPressed: () {
-                                              showRequestDialog(
-                                                listing['id'],
-                                                listing['title'],
-                                              );        
-                                            },          
-                                          icon: const Icon(Icons.send),
-                                          label: const Text('Request'),
-                                        ),
+                                            // Opens the request form
+                                            ElevatedButton.icon(
+                                              onPressed: () {
+                                                showRequestDialog(
+                                                  listing['id'],
+                                                  listing['title'],
+                                                );
+                                              },
+                                              icon: const Icon(Icons.send),
+                                              label: const Text('Request'),
+                                            ),
 
-                                        const SizedBox(width: 8),
+                                            const SizedBox(width: 8),
 
-                                        IconButton(
-                                          onPressed: () {
-                                            deleteListing(listing['id']);
-                                          },
-                                          icon: const Icon(Icons.delete),
+                                            // Deletes the listing
+                                            IconButton(
+                                              onPressed: () {
+                                                deleteListing(listing['id']);
+                                              },
+                                              icon: const Icon(Icons.delete),
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                    ),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -341,6 +373,8 @@ class _ListingScreenState extends State<ListingScreen> {
           );
         },
       ),
+
+      // Refresh button for reloading listings
       floatingActionButton: FloatingActionButton(
         onPressed: refreshListings,
         child: const Icon(Icons.refresh),
