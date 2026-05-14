@@ -3,8 +3,7 @@ import 'listingscreen.dart';
 import 'createlisting.dart';
 import 'requestscreen.dart';
 
-// The HomeScreen is the main screen of the app that contains a bottom navigation bar to switch between the three main sections:
-// Browse Skills, Create Listing, and Requests. 
+// Main screen that controls navigation between the app pages
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -13,14 +12,17 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // Stores the currently selected page index
   int selectedIndex = 0;
 
+  // Titles shown in the app bar for each page
   final titles = const [
     'Browse Skills',
     'Create Listing',
     'Requests',
   ];
 
+  // Changes the page when a bottom navigation item is tapped
   void changePage(int index) {
     setState(() {
       selectedIndex = index;
@@ -29,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // The main pages used by the bottom navigation bar
     final pages = const [
       ListingScreen(),
       CreateListingScreen(),
@@ -37,10 +40,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        // Shows the title for the selected page
         title: Text(titles[selectedIndex]),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
+
+      // Shows the selected page
       body: pages[selectedIndex],
+
+      // Bottom navigation used to switch between pages
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
         onTap: changePage,
