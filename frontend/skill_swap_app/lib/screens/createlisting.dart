@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/apiservice.dart';
-// this screen allows users to create a new skill listing by filling out a form with the skill title, description, skill level, availability date and time, and contact details.//
-// It includes validation to ensure all fields are filled out correctly and provides feedback to the user upon successful creation or if there are any errors.  
+
+// This screen allows users to create a new skill listing
 class CreateListingScreen extends StatefulWidget {
   const CreateListingScreen({super.key});
 
@@ -10,15 +10,22 @@ class CreateListingScreen extends StatefulWidget {
 }
 
 class _CreateListingScreenState extends State<CreateListingScreen> {
+  // Controllers used to get text from the input fields
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
   final contactController = TextEditingController();
 
+  // Stores the selected skill level
   String selectedLevel = 'Beginner';
+
+  // Stores the selected availability date and time
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
+
+  // Tracks when the form is being submitted
   bool isLoading = false;
 
+  // Opens the date picker and saves the selected date
   Future<void> pickDate() async {
     final pickedDate = await showDatePicker(
       context: context,
@@ -34,6 +41,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     }
   }
 
+  // Opens the time picker and saves the selected time
   Future<void> pickTime() async {
     final pickedTime = await showTimePicker(
       context: context,
@@ -47,6 +55,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     }
   }
 
+  // Combines the selected date and time into one availability text
   String getAvailabilityText() {
     if (selectedDate == null || selectedTime == null) {
       return '';
@@ -59,6 +68,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
     return '$date at $time';
   }
 
+  // Checks the form and sends the listing to the backend
   Future<void> submitListing() async {
     if (titleController.text.trim().isEmpty ||
         descriptionController.text.trim().isEmpty ||
@@ -70,6 +80,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
       return;
     }
 
+    // Checks that the description is not too long
     if (descriptionController.text.trim().length > 150) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -79,11 +90,13 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
       return;
     }
 
+    // Shows loading while the listing is being created
     setState(() {
       isLoading = true;
     });
 
     try {
+      // Sends the listing data to the backend
       await ApiService.createListing(
         title: titleController.text.trim(),
         description: descriptionController.text.trim(),
@@ -94,22 +107,26 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
 
       if (!mounted) return;
 
+      // Clears the form after the listing is created
       titleController.clear();
       descriptionController.clear();
       contactController.clear();
 
+      // Resets the selected values
       setState(() {
         selectedLevel = 'Beginner';
         selectedDate = null;
         selectedTime = null;
       });
 
+      // Shows a success message
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Listing created successfully')),
       );
     } catch (error) {
       if (!mounted) return;
 
+      // Shows an error message if the listing fails
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error: $error')));
@@ -117,6 +134,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
 
     if (!mounted) return;
 
+    // Stops the loading state
     setState(() {
       isLoading = false;
     });
@@ -124,14 +142,16 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
 
   @override
   void dispose() {
+    // Disposes controllers when the screen is closed
     titleController.dispose();
     descriptionController.dispose();
-    super.dispose();
     contactController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Gets the current length of the description
     final descriptionLength = descriptionController.text.length;
 
     return Scaffold(
@@ -146,6 +166,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
 
             const SizedBox(height: 20),
 
+            // Input field for the skill title
             TextField(
               controller: titleController,
               decoration: const InputDecoration(
@@ -155,7 +176,8 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
             ),
             const SizedBox(height: 12),
 
-             TextField(
+            // Input field for contact details
+            TextField(
               controller: contactController,
               maxLines: 2,
               decoration: const InputDecoration(
@@ -164,10 +186,11 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.contact_mail),
               ),
-            ),  
+            ),
 
             const SizedBox(height: 12),
 
+            // Input field for the listing description
             TextField(
               controller: descriptionController,
               maxLines: 3,
@@ -182,6 +205,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
               ),
             ),
 
+            // Shows the description character count
             Text(
               '$descriptionLength / 150 characters',
               style: TextStyle(
@@ -191,6 +215,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
 
             const SizedBox(height: 12),
 
+            // Dropdown for selecting the skill level
             DropdownButtonFormField<String>(
               initialValue: selectedLevel,
               decoration: const InputDecoration(
@@ -214,6 +239,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
 
             const SizedBox(height: 16),
 
+            // Button for choosing the availability date
             OutlinedButton.icon(
               onPressed: pickDate,
               icon: const Icon(Icons.calendar_month),
@@ -226,6 +252,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
 
             const SizedBox(height: 8),
 
+            // Button for choosing the availability time
             OutlinedButton.icon(
               onPressed: pickTime,
               icon: const Icon(Icons.access_time),
@@ -238,6 +265,7 @@ class _CreateListingScreenState extends State<CreateListingScreen> {
 
             const SizedBox(height: 20),
 
+            // Button that submits the listing
             ElevatedButton(
               onPressed: isLoading ? null : submitListing,
               child: isLoading
